@@ -1,21 +1,28 @@
 import os
 import asyncio
 from typing import Optional, Tuple
-from agents import Agent, Runner, ItemHelpers, trace
+from agents import Agent, Runner, ItemHelpers, trace, WebSearchTool
 from agents.extensions.models.litellm_model import LitellmModel
+
 
 # Initialize agents with different models
 claude_agent = Agent(
     name="claude_agent",
     model=LitellmModel(
         model="anthropic/claude-3-5-sonnet-latest",
-        api_key=os.getenv("ANTHROPIC_API_KEY")
+        api_key=os.getenv("ANTHROPIC_API_KEY"),
     )
+)
+
+web_search_agent = Agent(
+    name="WebSearchAgent",
+    tools=[WebSearchTool()],
 )
 
 openai_agent = Agent(
     name="openai_agent",
-    model="gpt-4o-mini"
+    model="gpt-4o-mini",
+    handoffs=[web_search_agent]
 )
 
 async def get_parallel_responses(message: str) -> Tuple[str, str]:
