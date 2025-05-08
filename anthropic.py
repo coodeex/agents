@@ -14,7 +14,7 @@ def get_weather(city: str):
     return f"The weather in {city} is sunny."
 
 class AnthropicAssistant:
-    def __init__(self, api_key: Optional[str] = None, model: str = "anthropic/claude-3-sonnet-20240229"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "anthropic/claude-3-5-sonnet-latest"):
         """Initialize the Anthropic Assistant.
         
         Args:
