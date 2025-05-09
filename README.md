@@ -15,6 +15,9 @@ python guardrail.py
 .
 ```
 
+**Parallel Agent**
+This allows you to chat with multiple LLMs in parallel.
+Configure `PARALLEL_AGENT_TELEGRAM_BOT_TOKEN`
 ```
 cd parallel_agent
 
@@ -22,3 +25,18 @@ nohup bash -c 'while true; do python3 bot.py; echo "Crashed. Restarting..."; sle
 
 pkill -f bot.py
 ```
+
+**Git MCP Agent**
+This allows you to chat with your git repo.
+Configure `GIT_MCP_TELEGRAM_BOT_TOKEN` and `GIT_MCP_REPO_PATH`. Basically, you need to have the repo cloned in the `GIT_MCP_REPO_PATH` directory.
+```
+cd git_mcp_agent
+
+chmod +x git_pull.sh
+
+nohup bash -c 'while true; do python3 bot.py; echo "Crashed. Restarting..."; sleep 5; done' > bot.log 2>&1 &
+
+pkill -f bot.py
+```
+
+

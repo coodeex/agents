@@ -1,10 +1,16 @@
 import os
+import time
+import subprocess
+from pathlib import Path
 from pydantic import BaseModel
 from agents import Agent, Runner, ItemHelpers, trace, InputGuardrail, GuardrailFunctionOutput
 from agents.mcp import MCPServerStdio
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Global variable to track last pull time
+_last_pull_time = 0
 
 class GitOperationOutput(BaseModel):
     is_read_only: bool
@@ -28,9 +34,21 @@ async def git_readonly_guardrail(ctx, agent, input_data):
 
 
 async def get_git_mcp_response(message: str) -> str:
+    global _last_pull_time
     repo_path = os.getenv("GIT_MCP_REPO_PATH")
     if not repo_path:
         raise ValueError("Please set GIT_MCP_REPO_PATH in your .env file")
+
+    # Check if we need to pull (if more than 60 seconds have passed)
+    current_time = time.time()
+    if current_time - _last_pull_time > 60:
+        script_dir = Path(__file__).parent
+        pull_script = script_dir / "git_pull.sh"
+        try:
+            subprocess.run([str(pull_script), repo_path], check=True)
+            _last_pull_time = current_time
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Git pull failed with error: {e}")
 
     # Run the git MCP server as a subprocess
     async with MCPServerStdio(
