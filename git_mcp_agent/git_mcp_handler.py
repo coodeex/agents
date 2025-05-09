@@ -2,7 +2,9 @@ import os
 from pydantic import BaseModel
 from agents import Agent, Runner, ItemHelpers, trace, InputGuardrail, GuardrailFunctionOutput
 from agents.mcp import MCPServerStdio
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class GitOperationOutput(BaseModel):
     is_read_only: bool
@@ -25,7 +27,11 @@ async def git_readonly_guardrail(ctx, agent, input_data):
     )
 
 
-async def get_git_mcp_response(message: str, repo_path: str) -> str:
+async def get_git_mcp_response(message: str) -> str:
+    repo_path = os.getenv("GIT_MCP_REPO_PATH")
+    if not repo_path:
+        raise ValueError("Please set GIT_MCP_REPO_PATH in your .env file")
+
     # Run the git MCP server as a subprocess
     async with MCPServerStdio(
         params={"command": "uvx", "args": ["mcp-server-git"]}
