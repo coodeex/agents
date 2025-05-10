@@ -43,8 +43,18 @@ nohup bash -c 'while true; do python3 git_mcp_agent_bot.py; echo "Crashed. Resta
 pkill -f git_mcp_agent_bot.py
 ```
 
-
 **Voice Agent**
+This allows you to chat with the voice agent.
+
+```
+cd voice_agent
+
+nohup bash -c 'while true; do python3 voice_agent_bot.py; echo "Crashed. Restarting..."; sleep 5; done' > bot.log 2>&1 &
+
+pkill -f voice_agent_bot.py
+```
+
+**voice.py**
 ```
 sudo apt-get install libportaudio2
 python voice.py
