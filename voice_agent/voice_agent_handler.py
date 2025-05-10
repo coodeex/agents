@@ -22,6 +22,12 @@ async def voice_response(audio_data: bytes) -> bytes:
     # Convert OGG to raw PCM using pydub
     audio_segment = AudioSegment.from_ogg(io.BytesIO(audio_data))
     
+    # Normalize the input audio speed
+    # Telegram voice messages are typically at 48000 Hz
+    print(f"Audio segment frame rate: {audio_segment.frame_rate}")
+    if audio_segment.frame_rate == 48000:
+        audio_segment = audio_segment.set_frame_rate(24000)
+    
     # Convert to numpy array and ensure it's int16
     samples = np.array(audio_segment.get_array_of_samples())
     if audio_segment.sample_width == 2:  # 16-bit
@@ -51,7 +57,7 @@ async def voice_response(audio_data: bytes) -> bytes:
     # Convert to AudioSegment and then to OGG format
     response_segment = AudioSegment(
         response_audio.tobytes(), 
-        frame_rate=audio_segment.frame_rate,
+        frame_rate=24000,  # Match Telegram's frame rate
         sample_width=2,  # 16-bit
         channels=audio_segment.channels
     )
