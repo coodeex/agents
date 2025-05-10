@@ -24,7 +24,7 @@ async def voice_response(audio_data: bytes) -> bytes:
     
     # Normalize the input audio speed
     # Telegram voice messages are typically at 48000 Hz
-    print(f"Audio segment frame rate: {audio_segment.frame_rate}")
+    # print(f"Audio segment frame rate: {audio_segment.frame_rate}")
     if audio_segment.frame_rate == 48000:
         audio_segment = audio_segment.set_frame_rate(24000)
     
