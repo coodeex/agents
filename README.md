@@ -44,3 +44,8 @@ pkill -f git_mcp_agent_bot.py
 ```
 
 
+**Voice Agent**
+```
+sudo apt-get install libportaudio2
+python voice.py
+```

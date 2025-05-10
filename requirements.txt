@@ -60,3 +60,7 @@ uvicorn==0.34.2
 yarl==1.20.0
 zipp==3.21.0
 python-telegram-bot>=22.0
+
+sounddevice==0.5.1
+numpy==2.2.5
+openai-agents[voice]
