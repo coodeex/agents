@@ -64,3 +64,4 @@ python-telegram-bot>=22.0
 sounddevice==0.5.1
 numpy==2.2.5
 openai-agents[voice]
+pydub==0.25.1
