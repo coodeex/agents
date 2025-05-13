@@ -2,6 +2,7 @@ import asyncio
 from openai.types.responses import ResponseTextDeltaEvent
 from agents import Agent, Runner, ItemHelpers, function_tool
 import random
+import time
 
 # Define a simple tool that returns a random number of jokes
 @function_tool
@@ -14,10 +15,13 @@ async def stream_raw_responses():
     print("\n=== Raw Response Streaming Example ===")
     agent = Agent(
         name="Joker",
-        instructions="You are a helpful assistant that tells jokes.",
+        instructions="""You are a helpful assistant that tells detailed jokes. 
+        Each joke should be at least 3-4 sentences long with setup and punchline.
+        Add line breaks between jokes for readability.""",
     )
 
-    result = Runner.run_streamed(agent, input="Tell me a short joke.")
+    result = Runner.run_streamed(agent, input="Tell me 3 detailed jokes. Make them long with good setups.")
+    print("\nStarting to stream jokes token by token:\n")
     async for event in result.stream_events():
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
             print(event.data.delta, end="", flush=True)
@@ -28,11 +32,13 @@ async def stream_run_items():
     print("\n=== Run Items Streaming Example ===")
     agent = Agent(
         name="Joker",
-        instructions="First call the `how_many_jokes` tool, then tell that many jokes.",
+        instructions="""First call the `how_many_jokes` tool to determine the number of jokes.
+        Tell detailed jokes with good setups and punchlines.
+        Each joke should be at least 3-4 sentences long.""",
         tools=[how_many_jokes],
     )
 
-    result = Runner.run_streamed(agent, input="Tell me some jokes!")
+    result = Runner.run_streamed(agent, input="Tell me some detailed jokes with pauses between them!")
     print("Run starting...")
 
     async for event in result.stream_events():
@@ -47,6 +53,7 @@ async def stream_run_items():
                 print(f"📤 Tool output: {event.item.output}")
             elif event.item.type == "message_output_item":
                 print(f"💬 Message output:\n{ItemHelpers.text_message_output(event.item)}")
+                print("\n")  # Add extra line break for readability
 
     print("Run complete!")
 
