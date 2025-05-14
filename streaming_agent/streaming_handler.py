@@ -2,6 +2,14 @@ import os
 from typing import Optional
 from agents import Agent, Runner, ItemHelpers, trace, WebSearchTool, function_tool
 from openai.types.responses import ResponseTextDeltaEvent
+from dataclasses import dataclass
+from asyncio import Lock
+
+@dataclass
+class StreamingState:
+    text: str = ""
+    is_complete: bool = False
+    lock: Lock = Lock()
 
 # Initialize the OpenAI agent
 openai_agent = Agent(
@@ -11,23 +19,24 @@ openai_agent = Agent(
     Your responses should be well-structured and informative."""
 )
 
-async def get_streaming_response(message: str, callback):
+async def get_streaming_response(message: str, state: StreamingState):
     """
-    Get streaming response from the OpenAI agent.
+    Get streaming response from the OpenAI agent and update the shared state.
     
     Args:
         message: The user's input message
-        callback: Async function to call with each chunk of the response
+        state: Shared state object for storing the accumulated text
     """
     with trace("Streaming response"):
-        accumulated_text = ""
         result = Runner.run_streamed(openai_agent, message)
         
         async for event in result.stream_events():
             if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
                 chunk = event.data.delta
                 if chunk:  # Only process non-empty chunks
-                    accumulated_text += chunk
-                    await callback(accumulated_text)
+                    async with state.lock:
+                        state.text += chunk
         
-        return accumulated_text 
+        # Mark streaming as complete
+        async with state.lock:
+            state.is_complete = True 
