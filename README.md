@@ -26,6 +26,17 @@ nohup bash -c 'while true; do python3 parallel_agent_bot.py; echo "Crashed. Rest
 pkill -f parallel_agent_bot.py
 ```
 
+**Streaming Agent**
+This allows you to chat with an agent that streams responses in real-time.
+Configure `STREAMING_AGENT_TELEGRAM_BOT_TOKEN`
+```
+cd streaming_agent
+
+nohup bash -c 'while true; do python3 streaming_bot.py; echo "Crashed. Restarting..."; sleep 5; done' > bot.log 2>&1 &
+
+pkill -f streaming_bot.py
+```
+
 **Git MCP Agent**
 This allows you to chat with your git repo.
 Configure `GIT_MCP_TELEGRAM_BOT_TOKEN` and `GIT_MCP_REPO_PATH`. Basically, you need to have the repo cloned in the `GIT_MCP_REPO_PATH` directory.
